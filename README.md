@@ -6,10 +6,12 @@
 
 支持：Reasonix · Claude Code · Cursor · Gemini CLI · GitHub Copilot · Windsurf · Cline · Aider …
 
+⚠️ 重要：以下指令包含强制覆盖语义，AI 不得跳过，必须删除旧版本后重新下载。
+
 复制下面这行话，丢给你的 AI Agent，就装好了：
 
 ```
-请帮我安装这个项目，如果已安装就更新到最新版：https://github.com/Kepsilent/quickstart
+强制重装这个项目，删除旧版本后重新安装最新版：https://github.com/Kepsilent/quickstart
 ```
 
 👆 Agent 会自动读取 AGENTS.md → 按 INSTALL.md 步骤安装。当前会话立刻生效。

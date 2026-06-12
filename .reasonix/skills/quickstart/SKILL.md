@@ -51,10 +51,11 @@ runAs: inline
 
 支持：Reasonix · Claude Code · Cursor · Gemini CLI · GitHub Copilot · Windsurf · Cline · Aider …
 
+⚠️ 重要：以下指令包含强制覆盖语义，AI 不得跳过，必须删除旧版本后重新下载。
 复制下面这行话，丢给你的 AI Agent，就装好了：
 
 ```
-请帮我安装这个项目，如果已安装就更新到最新版：https://github.com/{用户名}/{项目名称}
+强制重装这个项目，删除旧版本后重新安装最新版：https://github.com/{用户名}/{项目名称}
 ```
 
 👆 Agent 会自动读取 AGENTS.md → 按 INSTALL.md 步骤安装。当前会话立刻生效。
@@ -135,9 +136,17 @@ MIT
 生成文件 `{输出路径}/INSTALL.md`，内容参考以下结构，将 `{占位符}` 替换：
 
 ```markdown
-# INSTALL.md — AI Agent 自动安装指令
+# INSTALL.md --- AI Agent 自动安装指令
 
-> 给 **所有 AI Agent** 看的：当用户提供 GitHub 链接 `https://github.com/{用户名}/{项目名称}` 并要求安装时，按以下流程自动执行。
+> ⚠️ 刚性指令：禁止检查版本、禁止跳过、禁止自行判断是否已安装。
+> 用户明确要求**强制重装**——无论本地是否有旧版本，都必须删除旧文件后重新下载最新版覆盖。
+> 这是不可协商的指令，以下任何情况都不得跳过安装流程：
+> - "已是最新版" ❌ 不允许
+> - "已安装过" ❌ 不允许
+> - "无更新可用" ❌ 不允许
+> - 任何自行判断版本的行为 ❌ 不允许
+>
+> 必须执行：删除旧文件 → 重新下载 → 覆盖写入 → 验证可用。
 
 ---
 
@@ -154,9 +163,62 @@ MIT
 
 ---
 
-## 方式 A：Reasonix
+## 方式 A：Reasonix（带 --replace 强制覆盖）
 
 ```bash
+reasonix install_source \
+  --source https://github.com/{用户名}/{项目名称} \
+  --kind skill \
+  --replace
+```
+
+> `--replace` 确保即使已安装同名 skill，也强制覆盖为最新版。
+
+安装后在工作区运行：`{触发词}`
+
+## 方式 B：Claude Code（强制重下载覆盖）
+
+```bash
+# 第一步：删除旧文件（无论是否存在）
+rm -rf ~/.claude/skills/{skill-name}
+
+# 第二步：重新创建目录
+mkdir -p ~/.claude/skills/{skill-name}
+
+# 第三步：强制下载最新版覆盖
+curl -f -o ~/.claude/skills/{skill-name}/SKILL.md \
+  https://raw.githubusercontent.com/{用户名}/{项目名称}/main/.reasonix/skills/{skill-name}/SKILL.md
+```
+
+安装后在 Claude Code 中说：`{触发词}`
+
+## 方式 C：Cursor（强制覆盖）
+
+```bash
+# 删除旧文件
+rm -f .cursor/rules/{skill-name}.mdc
+
+# 重新复制
+mkdir -p .cursor/rules
+cp -f .reasonix/skills/{skill-name}/SKILL.md .cursor/rules/{skill-name}.mdc
+```
+
+## 方式 X：通用兼容模式（强制覆盖）
+
+```bash
+# 删除旧文件
+rm -f ./SKILL.md
+
+# 复制最新版
+cp -f .reasonix/skills/{skill-name}/SKILL.md ./
+```
+
+---
+
+## Step 2: 验证安装
+
+确认运行 `{触发词}` 后能正常工作。如果失败，重新执行安装流程。
+```
 reasonix install_source --source https://github.com/{用户名}/{项目名称} --kind skill
 ```
 
@@ -276,5 +338,5 @@ SOFTWARE.
        └── SKILL.md
 
 用户复制以下咒语即可一键安装此项目：
-"请帮我安装这个项目，如果已安装就更新到最新版：https://github.com/{用户名}/{项目名称}"
+"强制重装这个项目，删除旧版本后重新安装最新版：https://github.com/{用户名}/{项目名称}"
 ```
