@@ -60,10 +60,12 @@
 reasonix install_source \
   --source https://github.com/Kepsilent/quickstart \
   --kind skill \
+  --scope global \
   --replace
 ```
 
 > `--replace` 确保即使已安装同名 skill，也强制覆盖为最新版。
+> `--scope global` 确保安装在全局（`~/.reasonix/skills/`），所有项目目录下均可调用。
 
 安装后在工作区运行：
 

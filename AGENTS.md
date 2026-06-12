@@ -32,13 +32,13 @@
 |------|------|
 | `INSTALL.md` | AI 自动安装指令（支持所有 Agent） |
 | `CLAUDE.md` | Claude Code 路由指引 |
-| `.reasonix/skills/quickstart/SKILL.md` | 核心：一键脚手架生成逻辑 |
+| `README.md` | 一键安装入口 |
 
 ---
 
-### 如果你是 Reasonix 用户
+### 已全局安装
 
-此项目已预置 Reasonix Skill，安装后可通过以下方式触发：
+此 Skill 已安装到全局（`~/.reasonix/skills/quickstart/`），在所有项目目录下均可使用：
 
 - **直接输入**：`/quickstart`
 - **自然语言**："帮我搭一个一键安装的项目结构"
