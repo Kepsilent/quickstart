@@ -43,31 +43,50 @@ runAs: inline
 生成文件 `{输出路径}/README.md`，内容模板如下（将 `{占位符}` 替换为实际信息）：
 
 ```markdown
-# {项目名称} 🧪
+# {项目名称}
 
 {一句话描述}
 
-## 🚀 一键安装
+---
+
+## 🚀 一键式傻瓜安装
+
+### 一句话搞定
 
 支持：Reasonix · Claude Code · Cursor · Gemini CLI · GitHub Copilot · Windsurf · Cline · Aider …
 
-⚠️ 重要：以下指令包含强制覆盖语义，AI 不得跳过，必须删除旧版本后重新下载。
-复制下面这行话，丢给你的 AI Agent，就装好了：
+直接复制下面这行话，丢给你的 AI Agent，就装好了：
 
 ```
 强制重装这个项目，删除旧版本后重新安装最新版：https://github.com/{用户名}/{项目名称}
 ```
 
-👆 Agent 会自动读取 AGENTS.md → 按 INSTALL.md 步骤安装。当前会话立刻生效。
+> ⚠️ 重要：AI 不得跳过安装流程，必须删除旧版本后重新下载覆盖。详见 `INSTALL.md`。
 
-装好后：
+Agent 会自动读取 `AGENTS.md` → 按 `INSTALL.md` 步骤执行。当前会话立刻生效。
+
+---
+
+## 🛠️ 傻瓜式使用
+
+装好后，在聊天框里直接输入：
+
 ```
 {触发词}
 ```
 
+或者用自然语言说：
+
+```
+- "帮我 {自然语言调用方式}"
+- "{触发词} 跑一下"
+```
+
+> 如果你已经装过但想升到最新版，重新复制顶部的那句话丢给 AI Agent 即可强制覆盖。
+
 ---
 
-## 这是什么
+## 📖 项目介绍
 
 {功能概述，2-5 段}
 
@@ -77,9 +96,10 @@ runAs: inline
 
 ```
 {项目名称}/
-├── README.md              # 本文档
+├── README.md              # 本文档（安装入口）
 ├── AGENTS.md              # AI Agent 发现入口
 ├── INSTALL.md             # AI 自动安装指令
+├── CLAUDE.md              # Claude Code 路由指引
 ├── LICENSE                # MIT 协议
 └── .reasonix/skills/{skill-name}/SKILL.md  # ⭐ 核心功能
 ```
@@ -128,10 +148,42 @@ MIT
 | 文件 | 用途 |
 |------|------|
 | `INSTALL.md` | AI 自动安装指令（支持所有 Agent） |
+| `CLAUDE.md` | Claude Code 路由指引 |
 | `.reasonix/skills/{skill-name}/SKILL.md` | 核心功能实现 |
+
+---
+
+### 如果你是 Reasonix 用户
+
+此项目已预置 Reasonix Skill，安装后可通过以下方式触发：
+
+- **直接输入**：`{触发词}`
+- **自然语言**："{自然语言调用方式}"
+- **手动运行**：`reasonix run_skill --name {skill-name}`
+
+Skill 文件位于 `.reasonix/skills/{skill-name}/SKILL.md`，可随时查看或修改。
 ```
 
-### Step 4: 生成 INSTALL.md
+### Step 4（新增）: 生成 CLAUDE.md
+
+生成文件 `{输出路径}/CLAUDE.md`：
+
+```markdown
+# {项目名称}
+
+这是 **Claude Code** 的路由文件。
+
+**关于本项目的安装、配置与开发规范，请务必阅读并严格遵循根目录下的 `AGENTS.md` 和 `INSTALL.md`。**
+
+---
+
+## 快速入口
+
+- [AGENTS.md](AGENTS.md) — AI Agent 安装指引（含详尽说明）
+- [INSTALL.md](INSTALL.md) — 自动安装指令（含防呆预检）
+```
+
+### Step 5: 生成 INSTALL.md
 
 生成文件 `{输出路径}/INSTALL.md`，内容参考以下结构，将 `{占位符}` 替换：
 
@@ -147,6 +199,35 @@ MIT
 > - 任何自行判断版本的行为 ❌ 不允许
 >
 > 必须执行：删除旧文件 → 重新下载 → 覆盖写入 → 验证可用。
+
+---
+
+## Step 0: 环境预检（防呆检查）
+
+在执行任何安装命令前，必须先完成以下预检，**任何一项不通过即中断并提示用户**：
+
+### 0.1 必要工具检查
+
+检查以下工具是否可用，缺少任意一个即提示用户安装：
+
+| 工具 | 检查命令 | 说明 |
+|------|---------|------|
+| `git` | `git --version` | 版本管理 |
+| `curl` | `curl --version` | 文件下载（Mac/Linux） |
+| `gh`（可选） | `gh --version` | GitHub CLI，用于创建仓库 |
+
+> AI 不得自行安装缺失工具，必须提示用户手动安装后重试。
+
+### 0.2 权限安全限制
+
+> ⛔ **绝对禁止**：在未获用户明确书面授权的情况下，AI 不得使用 `sudo`、`runas`、管理员身份或任何提权方式执行命令。
+>
+> 遇到权限错误（如 `Permission denied`、`EACCES`），AI 必须：
+> 1. 立即中断当前操作
+> 2. 明确告知用户遇到了权限问题
+> 3. 等待用户处理后再继续
+>
+> 不得自行重试、不得绕过、不得更换路径规避。
 
 ---
 
@@ -219,41 +300,8 @@ cp -f .reasonix/skills/{skill-name}/SKILL.md ./
 
 确认运行 `{触发词}` 后能正常工作。如果失败，重新执行安装流程。
 ```
-reasonix install_source --source https://github.com/{用户名}/{项目名称} --kind skill
-```
 
-安装后在工作区运行：`{触发词}`
-
-## 方式 B：Claude Code
-
-```bash
-mkdir -p ~/.claude/skills/{skill-name}
-curl -o ~/.claude/skills/{skill-name}/SKILL.md https://raw.githubusercontent.com/{用户名}/{项目名称}/main/.reasonix/skills/{skill-name}/SKILL.md
-```
-
-安装后在 Claude Code 中说：`{触发词}`
-
-## 方式 C：Cursor
-
-```bash
-mkdir -p .cursor/rules
-cp .reasonix/skills/{skill-name}/SKILL.md .cursor/rules/{skill-name}.mdc
-```
-
-## 方式 X：通用兼容模式
-
-```bash
-cp .reasonix/skills/{skill-name}/SKILL.md ./
-```
-
----
-
-## Step 2: 验证安装
-
-确认运行 `{触发词}` 后能正常工作。
-```
-
-### Step 5: 生成 SKILL.md 模板
+### Step 6: 生成 SKILL.md 模板
 
 生成文件 `{输出路径}/.reasonix/skills/{skill-name}/SKILL.md`：
 
@@ -264,21 +312,37 @@ description: {Skill 短描述}
 runAs: inline
 ---
 
-## 概述
+## 🚀 一键式傻瓜安装
 
-{功能概述，2-5 句话}
+如果你还没有安装此 Skill，直接复制下面的话丢给你的 AI Agent：
+
+```
+强制重装这个项目，删除旧版本后重新安装最新版：https://github.com/{用户名}/{项目名称}
+```
+
+Agent 会自动读取 `AGENTS.md` → 按 `INSTALL.md` 步骤执行。
+
+> 已安装但想升级到最新版？同上，重新复制这句话即可强制覆盖。
 
 ---
 
-## 使用方式
+## 🛠️ 傻瓜式使用
+
+装好后直接输入：
 
 ```
 {触发词}
 ```
 
+或者用自然语言说：
+
+```
+- "帮我 {自然语言调用方式}"
+```
+
 ---
 
-## 执行指令
+## 📖 执行指令
 
 ### Step 1: 准备工作
 
@@ -295,7 +359,7 @@ runAs: inline
 {注意事项}
 ```
 
-### Step 6: 生成 LICENSE
+### Step 7: 生成 LICENSE
 
 生成文件 `{输出路径}/LICENSE`（MIT 协议）：
 
@@ -323,20 +387,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-### Step 7: 汇总输出确认
+### Step 8: 汇总输出确认
 
 将生成的所有文件路径和摘要告知用户，确认安装完成。
 
 ```
 ✅ quickstart 脚手架已生成！
 📁 {输出路径}/
-   ├── README.md
-   ├── AGENTS.md
-   ├── INSTALL.md
-   ├── LICENSE
+   ├── README.md              # 安装入口（一句话搞定）
+   ├── AGENTS.md              # AI Agent 发现入口
+   ├── INSTALL.md             # 自动安装指令
+   ├── CLAUDE.md              # Claude Code 路由指引
+   ├── LICENSE                # MIT 协议
    └── .reasonix/skills/{skill-name}/
-       └── SKILL.md
+       ├── SKILL.md           # ⭐ 核心功能（自带安装+使用指引）
+       └── ...                # 更多文件按需添加
 
-用户复制以下咒语即可一键安装此项目：
+用户复制以下咒语即可一键安装（强制覆盖）：
 "强制重装这个项目，删除旧版本后重新安装最新版：https://github.com/{用户名}/{项目名称}"
+
+> 装好后在聊天框输入 `{触发词}` 即可使用。
 ```
