@@ -376,7 +376,8 @@ git add -A
 git commit -m "`🎉 initial: {项目名称}`"
 
 # 创建 GitHub 仓库并推送
-gh repo create {用户名}/{项目名称} --public --source=. --remote=origin --push
+gh repo create {用户名}/{项目名称} --public --source=. --remote=origin --push \
+  --description "{项目描述}"
 ```
 
 发布成功后告知用户：
@@ -398,5 +399,6 @@ cd {当前目录}
 git init
 git add -A
 git commit -m "`🎉 initial: {项目名称}`"
-gh repo create {用户名}/{项目名称} --public --source=. --remote=origin --push
+gh repo create {用户名}/{项目名称} --public --source=. --remote=origin --push \
+  --description "{项目描述}"
 ```
