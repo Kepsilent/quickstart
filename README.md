@@ -9,7 +9,7 @@
 复制下面这行话，丢给你的 AI Agent，就装好了：
 
 ```
-请帮我安装这个项目，如果已安装就更新到最新版：https://github.com/{你的用户名}/quickstart
+请帮我安装这个项目，如果已安装就更新到最新版：https://github.com/Kepsilent/quickstart
 ```
 
 👆 Agent 会自动读取 AGENTS.md → 按 INSTALL.md 步骤安装。当前会话立刻生效。

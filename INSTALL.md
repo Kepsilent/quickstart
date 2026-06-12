@@ -1,6 +1,6 @@
 # INSTALL.md — AI Agent 自动安装指令
 
-> 给 **所有 AI Agent** 看的：当用户提供 GitHub 链接 `https://github.com/{你的用户名}/quickstart` 并要求安装时，按以下流程自动执行。
+> 给 **所有 AI Agent** 看的：当用户提供 GitHub 链接 `https://github.com/Kepsilent/quickstart` 并要求安装时，按以下流程自动执行。
 
 ---
 
@@ -22,7 +22,7 @@
 执行以下命令即可一键安装：
 
 ```bash
-reasonix install_source --source https://github.com/{你的用户名}/quickstart --kind skill
+reasonix install_source --source https://github.com/Kepsilent/quickstart --kind skill
 ```
 
 安装后在工作区运行：
@@ -40,7 +40,7 @@ reasonix install_source --source https://github.com/{你的用户名}/quickstart
 mkdir -p ~/.claude/skills/quickstart
 
 # 下载 SKILL.md
-curl -o ~/.claude/skills/quickstart/SKILL.md https://raw.githubusercontent.com/{你的用户名}/quickstart/main/.reasonix/skills/quickstart/SKILL.md
+curl -o ~/.claude/skills/quickstart/SKILL.md https://raw.githubusercontent.com/Kepsilent/quickstart/main/.reasonix/skills/quickstart/SKILL.md
 
 # 如果已克隆仓库
 cp .reasonix/skills/quickstart/SKILL.md ~/.claude/skills/quickstart/
