@@ -54,7 +54,7 @@
 
 ---
 
-## 方式 A：Reasonix（带 --replace 强制覆盖）
+## 方式 A：Reasonix（全局安装 --scope global）
 
 ```bash
 reasonix install_source \

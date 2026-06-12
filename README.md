@@ -56,6 +56,8 @@ cd /path/to/your-project
 3. **在当前目录**生成 README / AGENTS.md / INSTALL.md / CLAUDE.md / LICENSE
 4. **主动询问**是否一键发布到 GitHub，选择发布即自动推送
 
+> **所有安装统一全局**：无论是 quickstart 还是 quickstart 处理后的项目，用户安装时都进入 `~/.reasonix/skills/`（全局），不会污染项目目录。
+>
 > 你只需要配一次 gh，以后任何项目都能直接调 gh 发布。
 
 > 所有文件生成后，AI **主动询问**是否一键发布到 GitHub，选择发布即可自动推送。
