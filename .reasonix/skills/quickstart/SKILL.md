@@ -1,13 +1,22 @@
 ---
 name: quickstart
-description: 为开源项目生成一键式傻瓜安装结构（README + AGENTS.md + INSTALL.md + SKILL.md 模板），抄自 soulcheck 模式
+description: 从脚手架生成到一键发布 GitHub —— 为开源项目提供「一键安装结构 + 一键发布」一站式自动化流程
 runAs: inline
 ---
 
 ## 概述
 
-为你新开源的 Reasonix 项目生成一套 soulcheck 风格的「一键式傻瓜安装」文件结构。
+一站式完成两件事：
+
+**① 生成一键安装结构**
+为你的开源项目生成 soulcheck 风格的「一键式傻瓜安装」文件结构。
 用户只需复制一句话丢给 AI Agent，Agent 就会自动读取 AGENTS.md → 按 INSTALL.md 步骤安装。
+
+**② 一键发布到 GitHub**
+检测到 gh CLI 已登录时，主动询问你是否需要将项目直接发布到 GitHub。
+选择「一键发布」即可自动完成 git init → commit → gh repo create → push。
+
+从生成到发布，全程自动化。
 
 ---
 
@@ -17,7 +26,11 @@ runAs: inline
 /quickstart
 ```
 
-按提示依次输入项目信息，即可在指定路径生成全套安装文件。
+按提示依次输入项目信息，AI 会：
+
+1. 自动检测 gh 登录状态（如已登录则自动填入 GitHub 用户名）
+2. 生成全套安装文件（README / AGENTS.md / INSTALL.md / CLAUDE.md / LICENSE / SKILL.md）
+3. **主动询问是否一键发布到 GitHub** → 选择发布则自动完成仓库创建和推送
 
 ---
 
@@ -31,8 +44,16 @@ runAs: inline
 |------|------|------|
 | **项目名称** | 英文/数字，用作目录名 | `my-tool` |
 | **一句话描述** | 项目定位 | "一个超级好用的 XXX 工具" |
-| **GitHub 用户名** | 你的 GitHub 账号 | `your-name` |
+| **GitHub 用户名** | 你的 GitHub 账号（**自动检测**，见下方说明） | `your-name` |
 | **Skill 名称** | 技能目录名 | `my-tool` |
+| **Skill 短描述** | ≤120 字，SKILL.md 用 | "做某某事情" |
+| **触发词** | 用户如何调用 | `/my-tool` |
+| **功能概述** | 2-5 句描述 Skill 做什么 | …… |
+| **输出路径** | 生成文件的目标目录 | 默认当前工作区 |
+
+> **AI 自动检测逻辑**：收集信息前先运行 `gh auth status` 检查 gh 登录状态。
+> - ✅ 如果已登录 → 提取用户名自动填入 GitHub 用户名字段，并告知用户：**"检测到已登录 GitHub：@{用户名}"**
+> - ❌ 如果未登录或 gh 未安装 → 提示用户手动输入 GitHub 用户名，然后继续。
 | **Skill 短描述** | ≤120 字，SKILL.md 用 | "做某某事情" |
 | **触发词** | 用户如何调用 | `/my-tool` |
 | **功能概述** | 2-5 句描述 Skill 做什么 | …… |
@@ -408,3 +429,74 @@ SOFTWARE.
 
 > 装好后在聊天框输入 `{触发词}` 即可使用。
 ```
+
+### Step 9: 一键发布到 GitHub
+
+生成文件全部就绪后，执行以下发布流程：
+
+#### 9.1 检测发布环境
+
+运行以下命令确认发布条件：
+
+```bash
+# 检查 git 是否可用
+git --version
+
+# 检查 gh 是否已登录
+gh auth status
+```
+
+> - ✅ git 可用 + gh 已登录 → 继续执行 9.2
+> - ❌ 任一缺失 → 告知用户缺少什么，给出安装指引，结束流程
+
+#### 9.2 询问用户
+
+通过 ask 工具询问用户：
+
+> **检测到 gh CLI 已就绪（登录账号：@{用户名}），是否将该项目一键发布到 GitHub？**
+
+选项：
+1. **🚀 一键发布** — 自动执行 git init → commit → gh repo create → push
+2. **⏭️ 跳过** — 仅输出手动发布指引
+3. **📝 手动** — 输出 gh 命令让用户自己操作
+
+#### 9.3 执行发布（用户选择「一键发布」时）
+
+```bash
+cd {输出路径}
+
+# 初始化 git 仓库
+git init
+
+# 添加所有文件
+git add -A
+
+# 提交
+git commit -m "`🎉 initial: {项目名称} — {一句话描述}`"
+
+# 创建 GitHub 仓库并推送
+gh repo create {用户名}/{项目名称} --public --source=. --remote=origin --push
+```
+
+发布成功后告知用户：
+
+> ✅ **一键发布成功！**
+> 📦 仓库地址：https://github.com/{用户名}/{项目名称}
+> 📋 安装咒语：
+> ```
+> 强制重装这个项目，删除旧版本后重新安装最新版：https://github.com/{用户名}/{项目名称}
+> ```
+
+#### 9.4 用户选择「跳过」或「手动」时
+
+输出手动发布指引：
+
+```bash
+cd {输出路径}
+git init
+git add -A
+git commit -m "`🎉 initial: {项目名称}`"
+gh repo create {用户名}/{项目名称} --public --source=. --remote=origin --push
+```
+
+> 用户也可手动操作：在 GitHub 新建仓库后，将本地文件推送上去。
