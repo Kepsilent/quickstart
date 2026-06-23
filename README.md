@@ -2,7 +2,9 @@
 
 Skill 适配工具 —— 下载别人的 Skill 自动装好，已装的 Skill 坏了也能修。
 
-🚀 **一键安装**：
+---
+
+## 🚀 一键安装
 
 ```
 https://raw.githubusercontent.com/Kepsilent/quickstart/main/Install.md
