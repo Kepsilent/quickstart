@@ -1,5 +1,7 @@
 # quickstart 🚀
 
+Skill 适配工具 —— 下载别人的 Skill 自动装好，已装的 Skill 坏了也能修。
+
 🚀 **一键安装**：
 
 ```
@@ -7,8 +9,6 @@ https://raw.githubusercontent.com/Kepsilent/quickstart/main/Install.md
 ```
 
 > 复制上面这行链接丢给你的 AI Agent，自动读 Install.md 完成安装。
-
-Skill 适配工具 —— 下载别人的 Skill 自动装好，已装的 Skill 坏了也能修。
 
 ---
 
