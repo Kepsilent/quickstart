@@ -16,7 +16,7 @@ https://raw.githubusercontent.com/Kepsilent/quickstart/main/Install.md
 
 ## 📥 我能帮你什么？
 
-### Model A — 安装适配
+### 安装适配
 
 你从网上下载了一个 Skill 文件，不知道怎么装到你的 AI Agent 里？
 
@@ -29,7 +29,7 @@ https://raw.githubusercontent.com/Kepsilent/quickstart/main/Install.md
 
 ---
 
-### Model B — 检查修复
+### 检查修复
 
 你装了个 Skill 但用不了？不知道为什么？
 
@@ -41,7 +41,7 @@ https://raw.githubusercontent.com/Kepsilent/quickstart/main/Install.md
 
 ---
 
-### Model C — 生成 Install.md
+### 生成 Install.md
 
 为你的项目生成唯一的 `Install.md`，任何 AI Agent 读它就知道怎么装这个 Skill。
 

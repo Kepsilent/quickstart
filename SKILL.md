@@ -10,15 +10,15 @@ runAs: inline
 
 **quickstart** 就是干这个的。它是一个「Skill 适配工具」：
 
-1. **📥 Model A — 安装适配**：给一个 Skill 链接或文件，自动检测你当前用的 AI Agent，转成你能用的格式并装好
-2. **🔧 Model B — 检查修复**：列出你装过的所有 Skill，检查哪个有问题，修好重装
-3. **🏗️ Model C — 生成 Install.md**：为项目生成唯一的 `Install.md`，任何 AI Agent 读它就知道怎么装这个 Skill
+1. **📥 安装适配**：给一个 Skill 链接或文件，自动检测你当前用的 AI Agent，转成你能用的格式并装好
+2. **🔧 检查修复**：列出你装过的所有 Skill，检查哪个有问题，修好重装
+3. **🏗️ 生成 Install.md**：为项目生成唯一的 `Install.md`，任何 AI Agent 读它就知道怎么装这个 Skill
 
 ---
 
 ## 使用方式
 
-### Model A — 安装适配
+### 安装适配
 
 ```
 /quickstart https://github.com/user/repo
@@ -34,7 +34,7 @@ runAs: inline
 → 输入链接或路径
 ```
 
-### Model B — 检查修复
+### 检查修复
 
 ```
 /quickstart 修复
@@ -42,7 +42,7 @@ runAs: inline
 
 AI 会列出所有已安装的 Skill（带安装时间），你点选要修哪个。
 
-### Model C — 生成 Install.md
+### 生成 Install.md
 
 ```
 /quickstart 就这个项目
@@ -62,9 +62,9 @@ AI 检测项目中的 Skill，生成唯一的 `Install.md`，任何 AI Agent 读
 | 输入 | 行为 |
 |------|------|
 | 无参数 | 用 ask 列出三种模式让用户点选 |
-| URL / 本地路径 / 文件 | AI 尝试读取 → 判断是不是 Skill → 是则走 Model A |
-| 含「修复」关键词 | 走 Model B |
-| 含项目意图（「就这个项目」「适配」等） | 走 Model C |
+| URL / 本地路径 / 文件 | AI 尝试读取 → 判断是不是 Skill → 走安装适配 |
+| 含「修复」关键词 | 走检查修复 |
+| 含项目意图（「就这个项目」「适配」等） | 走生成 Install.md |
 | 其他内容 | AI 自行理解意图，不确定则 ask 确认 |
 
 > **核心原则**：不硬编码匹配规则，AI 灵活理解用户意图。
@@ -86,7 +86,7 @@ curl --version
 
 ---
 
-## Model A — 安装适配
+## 安装适配
 
 ### A1: 获取目标 Skill
 
@@ -162,7 +162,7 @@ runAs: inline  # 或 subagent
 
 ---
 
-## Model B — 检查修复
+## 检查修复
 
 ### B1: 列出已安装的 Skill
 
@@ -228,7 +228,7 @@ head -10 {skill-path}
 
 ---
 
-## Model C — 生成 Install.md
+## 生成 Install.md
 
 > 唯一产物：项目根目录下的 `Install.md`，纯给 AI Agent 读的，不是给人看的。
 > 任何 AI Agent 读到 `Install.md`，就知道这个项目是什么、怎么把 Skill 装到自己身上。
