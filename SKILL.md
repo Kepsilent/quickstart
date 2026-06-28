@@ -20,9 +20,16 @@ runAs: inline
 
 ### 安装适配
 
+**方式一：从网页链接安装**
+
 ```
 /quickstart https://github.com/user/repo
-/quickstart https://raw.githubusercontent.com/.../SKILL.md
+/quickstart https://huggingface.co/user/repo
+```
+
+**方式二：从本地文件安装**
+
+```
 /quickstart /path/to/skill.md
 ```
 

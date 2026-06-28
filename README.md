@@ -18,14 +18,20 @@ https://raw.githubusercontent.com/Kepsilent/quickstart/main/Install.md
 
 ### 安装适配
 
-你从网上下载了一个 Skill 文件，不知道怎么装到你的 AI Agent 里？
+从网上下载了一个 Skill 文件不知道怎么装？或者本地已经有 Skill 文件想装到 AI 里？
 
+**方式一：从网页链接安装**
 ```
 /quickstart https://github.com/xxx/xxx
+/quickstart https://huggingface.co/xxx/xxx
+```
+输入 Skill 的网页链接，AI 自动下载、适配、安装，一步到位。
+
+**方式二：从本地文件安装**
+```
 /quickstart /path/to/skill.md
 ```
-
-给链接或文件路径，AI 自动装好，你马上就能用 `/{skill-name}`。
+输入本地 Skill 文件的路径，AI 直接读取并安装。
 
 ---
 
