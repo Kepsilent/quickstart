@@ -246,10 +246,9 @@ head -10 {skill-path}
 
 生成 Install.md 必须要有项目链接，AI 按以下逻辑处理：
 
-1. **检查是否已有链接**（上下文、用户之前给的 URL 等）
-   - 有链接 → 弹出来让用户确认
-   - 无链接 → 询问用户项目链接
-2. 用户没有链接 → 提醒用户：需要先发布项目才能生成安装入口
+1. **先问平台**：用户把项目放哪？GitHub / Hugging Face / 其他
+2. **再问链接**：有链接 → 弹出来确认；无链接 → 让用户给
+3. 用户没有链接 → 提醒需要先发布项目才能生成安装入口
 
 ### C3: 生成 Install.md
 
@@ -270,11 +269,14 @@ head -10 {skill-path}
 Install.md 生成后，引导用户：
 
 1. 把 Install.md 连同项目一起发布到对应平台
-2. 发布后获取 Install.md 的 raw 直链
+2. 发布后，根据平台拼出 Install.md 的 raw 直链：
+   - **GitHub** → `https://raw.githubusercontent.com/{用户}/{仓库}/main/Install.md`
+   - **Hugging Face** → `https://huggingface.co/{用户}/{仓库}/raw/main/Install.md`
+   - **其他平台** → 让用户自己提供 raw 直链
 3. 咒语 = 该直链，用户复制丢给 AI 即可自动安装
 
 > 告诉用户：安装入口已就绪。发布项目后，把 Install.md 的直链丢给 AI，
-> AI 自己读文件、自己拼链接、自己完成安装。
+> AI 自己读文件、自己完成安装。
 
 ---
 
