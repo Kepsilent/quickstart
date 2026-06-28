@@ -23,7 +23,6 @@ https://raw.githubusercontent.com/Kepsilent/quickstart/main/Install.md
 **方式一：从网页链接安装**
 ```
 /quickstart https://github.com/xxx/xxx
-/quickstart https://huggingface.co/xxx/xxx
 ```
 输入 Skill 的网页链接，AI 自动下载、适配、安装，一步到位。
 
