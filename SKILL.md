@@ -1,6 +1,6 @@
 ---
 name: quickstart
-description: 一言装 —— 复制一句话，丢给 AI Agent 就装好
+description: Skill 三合一工具：生成安装入口、自动适配安装、智能检查修复
 runAs: inline
 ---
 
@@ -8,7 +8,7 @@ runAs: inline
 
 你开源了一个项目，想让别人复制一句话丢给 AI 就能装好？或者想给已有项目生成标准安装入口？
 
-**quickstart** 就是干这个的。它是一个「一言装」安装工具：
+**quickstart** 就是干这个的。它是一个 Skill 三合一工具：生成安装入口、自动适配安装、智能检查修复。
 
 1. **📥 安装适配**：给一个 Skill 链接或文件，自动检测你当前用的 AI Agent，转成你能用的格式并装好
 2. **🔧 检查**：列出你装过的所有 Skill，检查哪个有问题，修好重装

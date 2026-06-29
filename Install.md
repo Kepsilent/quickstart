@@ -2,7 +2,7 @@
 
 项目链接：https://github.com/Kepsilent/quickstart
 
-一言装 —— 复制一句话，丢给 AI Agent 就装好
+Skill 三合一工具：生成安装入口、自动适配安装、智能检查修复
 
 ---
 
