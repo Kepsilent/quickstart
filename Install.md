@@ -2,7 +2,7 @@
 
 项目链接：https://github.com/Kepsilent/quickstart
 
-Skill 适配工具 —— 下载别人的 Skill 自动装好，已装的 Skill 坏了也能修。
+一键式傻瓜安装脚手架 —— 为开源项目生成「复制一句话，丢给 AI Agent 就装好」的标准化安装结构
 
 ---
 
