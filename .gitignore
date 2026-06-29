@@ -1,2 +1,2 @@
-# Reasonix 桌面会话缓存
-.reasonix/desktop-topic-*.json
+# Reasonix 本地会话缓存（整个目录排除）
+/.reasonix/

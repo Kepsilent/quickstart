@@ -57,7 +57,7 @@ https://raw.githubusercontent.com/Kepsilent/quickstart/main/Install.md
 
 ---
 
-> 📌 目前适配平台：**GitHub**、**Hugging Face**。其他平台欢迎提 Issue。
+> 📌 目前适配平台：**GitHub**。
 
 ---
 

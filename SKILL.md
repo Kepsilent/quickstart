@@ -24,7 +24,6 @@ runAs: inline
 
 ```
 /quickstart https://github.com/user/repo
-/quickstart https://huggingface.co/user/repo
 ```
 
 **方式二：从本地文件安装**
@@ -101,9 +100,16 @@ curl --version
 
 | 输入类型 | 获取方式 |
 |---------|---------|
-| 远程 URL（GitHub / GitLab / Hugging Face / 任意直链） | `curl` 或 `wget` 下载 |
+| 远程 URL（GitHub 项目链接 / 任意 .md 直链） | 见下方「URL 解析规则」 |
 | 本地路径 | `read_file` 读取 |
-| 文本内容（非 URL/路径） | AI 自行理解 → 可能是项目名 → 在常见目录查找 |
+| 文本内容（非 URL/路径） | 无法自动定位 → 用 ask 询问用户提供链接或路径，不要自行猜测 |
+
+> **URL 解析规则：** 用户给的不一定是 Skill 文件直链，可能是项目主页，需要逐层探测：
+> 1. 如果是 GitHub 项目链接（`github.com/user/repo`），先试探 `https://raw.githubusercontent.com/user/repo/main/SKILL.md`
+> 2. 如果返回 404，再试探 `https://raw.githubusercontent.com/user/repo/main/<项目名>.md`（项目名从 URL 取）
+> 3. 如果仍然 404，`git clone https://github.com/user/repo.git` 到临时目录，本地读取
+> 4. 如果是任意直链（`.md` 结尾），直接 `curl` 下载
+> 5. 所有方式均失败 → 告知用户无法获取 Skill 文件，流程结束
 
 下载/读取后，将内容保存在变量 `{skill_content}` 中。
 
@@ -125,7 +131,7 @@ runAs: inline  # 或 subagent
 - **推荐**有 `description` 字段
 - **推荐**有 `runAs` 字段
 
-如果有缺失，用 ask 询问用户补充。
+如果有缺失，用 ask 询问用户补充。同一字段 ask 超过 2 次仍无效（用户未提供有效值）→ 告知用户无法继续，流程结束。
 
 ```
 ❌ 不是有效的 Skill → 告知用户，流程结束
@@ -154,6 +160,8 @@ runAs: inline  # 或 subagent
 2. 将 Skill 文件写入该目录
 3. 如果来源是远程 URL，先下载再安装
 
+> ⛔ **sudo 禁令**：绝对禁止使用 `sudo` / `runas` / 管理员权限执行任何写入/移动/创建目录命令。如果遇到权限错误，立即中断并告知用户手动处理，不要尝试提权。
+>
 > AI 自行决定具体的安装命令，不需要拘泥于固定格式。
 > 核心目标只有一个：让用户能通过 `/{skill-name}` 调用这个 Skill。
 
@@ -209,7 +217,7 @@ runAs: inline  # 或 subagent
 | `description` 字段缺失 | frontmatter 中没有 description | ask 用户输入一句话描述 |
 | `runAs` 字段缺失或错误 | 不是 inline/subagent | ask 用户选择运行方式 |
 | 安装路径不对 | Skill 文件在错误的位置 | 移动到正确的 Agent 目录 |
-| 文件内容损坏 | 为空或无效 Markdown | 告知用户重新下载 |
+| 文件内容损坏 | 为空或无效 Markdown | 告知用户重新下载；如果记得原来源，引导用户从原项目重新获取；无法找回则建议用户联系原作者 |
 
 ### B3: 修复 + 重装
 
@@ -219,13 +227,15 @@ runAs: inline  # 或 subagent
 - 路径不对 → 用 `cp` 或 `mv` 移到正确位置
 - 格式错误 → AI 自动修正格式
 
-修复完成后重新验证：
+> ⛔ **sudo 禁令**：绝对禁止使用 `sudo` / `runas` / 管理员权限执行任何移动/写入/创建目录命令。遇权限错误立即中断并告知用户。
 
-```bash
-# 验证修复后的文件
-head -10 {skill-path}
-# 检查 frontmatter 完整性
-```
+修复完成后，**必须重新走安装流程**以确保 Skill 能正常使用：
+
+1. **回到 A3** — 重新检测当前 Agent 类型
+2. **回到 A4** — 将修复后的 Skill 安装到正确的 Agent 目录
+3. **回到 A5** — 验证 `/{skill-name}` 能正常调用
+
+> 只修文件不重装 = 修了但用不了。必须完整走 A3→A4→A5。
 
 ### B4: 告知用户
 
@@ -253,9 +263,9 @@ head -10 {skill-path}
 
 生成 Install.md 必须要有项目链接，AI 按以下逻辑处理：
 
-1. **先问平台**：用户把项目放哪？GitHub / Hugging Face / 其他
-2. **再问链接**：有链接 → 弹出来确认；无链接 → 让用户给
-3. 用户没有链接 → 提醒需要先发布项目才能生成安装入口
+1. **先取项目链接**：查看当前项目是否有 git remote origin（`git remote get-url origin`）→ 自动提取 GitHub 链接
+2. 没有 remote 或不是 GitHub → 用 ask 让用户输入 GitHub 仓库链接
+3. 用户没有链接 → 提醒需要先发布项目到 GitHub 才能生成安装入口
 
 ### C3: 生成 Install.md
 
@@ -266,7 +276,7 @@ head -10 {skill-path}
 - **项目链接**（C2 获取的）—— 告诉 AI 去哪里拿这个 Skill
 - 安装指引：AI 读了就知道要装什么、怎么装
 
-同时在 README.md **介绍内容的下方**注入一个「🚀 一键安装」独立板块（不要动 README 其他内容）。
+同时在 README.md **第一个 `---` 分隔线之后**注入一个「🚀 一键安装」独立板块（不要动 README 其他内容）。
 
 > Install.md 是「拼图」，SKILL.md 是「零件」。
 > 项目链接告诉 AI「去哪里买零件」。
@@ -278,8 +288,6 @@ Install.md 生成后，引导用户：
 1. 把 Install.md 连同项目一起发布到对应平台
 2. 发布后，根据平台拼出 Install.md 的 raw 直链：
    - **GitHub** → `https://raw.githubusercontent.com/{用户}/{仓库}/main/Install.md`
-   - **Hugging Face** → `https://huggingface.co/{用户}/{仓库}/raw/main/Install.md`
-   - **其他平台** → 让用户自己提供 raw 直链
 3. 咒语 = 该直链，用户复制丢给 AI 即可自动安装
 
 > 告诉用户：安装入口已就绪。发布项目后，把 Install.md 的直链丢给 AI，
