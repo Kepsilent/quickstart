@@ -34,12 +34,12 @@ https://raw.githubusercontent.com/Kepsilent/quickstart/main/Install.md
 
 ---
 
-### 检查修复
+### 检查
 
 你装了个 Skill 但用不了？不知道为什么？
 
 ```
-/quickstart 修复
+/quickstart 检查
 ```
 
 列出你装过的所有 Skill（带安装时间），选一个，AI 查出问题修好。

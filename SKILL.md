@@ -11,7 +11,7 @@ runAs: inline
 **quickstart** 就是干这个的。它是一个「Skill 适配工具」：
 
 1. **📥 安装适配**：给一个 Skill 链接或文件，自动检测你当前用的 AI Agent，转成你能用的格式并装好
-2. **🔧 检查修复**：列出你装过的所有 Skill，检查哪个有问题，修好重装
+2. **🔧 检查**：列出你装过的所有 Skill，检查哪个有问题，修好重装
 3. **🏗️ 生成 Install.md**：为项目生成唯一的 `Install.md`，任何 AI Agent 读它就知道怎么装这个 Skill
 
 ---
@@ -26,7 +26,7 @@ runAs: inline
 |------|------|
 | 无参数 | 用 ask 列出三种模式让用户点选 |
 | URL / 本地路径 / 文件 | AI 尝试读取 → 判断是不是 Skill → 走安装适配 |
-| 含「修复」关键词 | 走检查修复 |
+| 含「检查」「check」关键词 | 走检查 |
 | 含项目意图（「就这个项目」「适配」等） | 走生成 Install.md |
 | 其他内容 | AI 自行理解意图，不确定则 ask 确认 |
 
@@ -130,25 +130,134 @@ runAs: inline  # 或 subagent
 
 ---
 
-## 检查修复
+## 检查
 
-### B1: 列出已安装的 Skill
+```mermaid
+flowchart TB
+    ENTER(["用户输入<br>/quickstart check / 检查"]) --> L1
 
-扫描你已知的常见 Skill 安装目录（例如 `~/.reasonix/skills/`、`~/.claude/skills/`、`.cursor/rules/` 等），按时间排序列表，用 ask 让用户点选要修复哪个：
+    subgraph L1[主菜单]
+        L1_ASK["ask 点选"]
+        L1_ASK --> A["🔍 全面诊断"]
+        L1_ASK --> B["🔧 问题定位"]
+        L1_ASK --> C["🔄 版本巡检"]
+        L1_ASK --> D["🧹 深度清洁"]
+        L1_ASK --> E["📋 报告管理"]
+        L1_ASK --> X["❌ 取消"]
+    end
+
+    A --> A1["全量扫描所有 Skill"]
+    A1 --> A2["汇总报告"]
+    A2 --> A3_ASK["ask 下一步"]
+    A3_ASK --> A3a["⚡ 一键全修"]
+    A3_ASK --> A3b["📋 逐项查看"]
+    A3a --> A3a1["自动修复 → 重装验证<br>A3→A4→A5"]
+
+    B --> B1["列表 → ask 选 Skill"]
+    B1 --> B2["诊断具体问题"]
+    B2 --> B3_ASK["ask 操作"]
+    B3_ASK --> B3a["🤖 自动修复"]
+    B3_ASK --> B3b["⏪ 版本回滚"]
+    B3a --> RE["重装验证 A3→A4→A5"]
+
+    C --> C1["获取源地址"]
+    C1 --> C1a["known-sources.json"]
+    C1 --> C1b["自动推导"]
+    C1 --> C1c["手动输入"]
+    C1a --> C2["对比版本"]
+    C1b --> C2
+    C1c --> C2
+    C2 --> C3["显示过时列表"]
+    C3 --> C3_ASK["ask"]
+    C3_ASK --> C3a["🔄 更新全部"]
+    C3_ASK --> C3b["📝 逐项更新"]
+    C3_ASK --> C3c["🙈 忽略"]
+
+    D --> D1["扫描三类问题"]
+    D1 --> D1a["🗑️ 残留目录"]
+    D1 --> D1b["⚠️ 同名冲突"]
+    D1 --> D1c["📦 备份文件"]
+    D1a --> D2_ASK["ask 确认"]
+    D1b --> D2_ASK
+    D1c --> D2_ASK
+    D2_ASK --> D2a["✅ 全部清理"]
+    D2_ASK --> D2b["📝 逐项选择"]
+
+    E --> E1_ASK["ask 操作"]
+    E1_ASK --> E1a["📤 导出 repair-log.md"]
+    E1_ASK --> E1b["📥 查看上次记录"]
+    E1_ASK --> E1c["📋 管理 known-sources.json"]
+```
+
+---
+
+### Level 1 — 主菜单
+
+进入检查模式后，先弹出主菜单让用户点选：
 
 > ask(questions=[{
->   header: "选择要修复的 Skill",
->   question: "检测到以下已安装的 Skill，请选择要修复的一个：",
+>   header: "🔧 检查",
+>   question: "请选择要执行的操作：",
 >   options: [
->     { label: "🔧 quickstart（2025-06-13 安装）" },
->     { label: "🔧 soulcheck（2025-06-12 安装）" },
->     { label: "❌ 取消" }
+>     { label: "🔍 全面诊断", desc: "扫描所有 Skill，一次性查出全部问题" },
+>     { label: "🔧 问题定位", desc: "选一个 Skill 单独诊断修复" },
+>     { label: "🔄 版本巡检", desc: "检查已安装 Skill 是否有新版本" },
+>     { label: "🧹 深度清洁", desc: "清理残留目录 / 冲突文件 / 备份" },
+>     { label: "📋 报告管理", desc: "导出诊断报告 / 管理源列表" },
+>     { label: "❌ 取消" },
 >   ]
 > }])
 
-### B2: 诊断问题
+---
 
-读取该 Skill 文件内容，逐项检查常见问题：
+### ① 全面诊断
+
+全量扫描所有已安装 Skill，汇总报告：
+
+```
+📊 全面诊断报告
+┌──────────────┬────────┬──────────────────┐
+│ Skill        │ 状态   │ 问题              │
+├──────────────┼────────┼──────────────────┤
+│ quickstart   │ ✅ 正常│ —                │
+│ soulcheck    │ ⚠️ 异常│ description 缺失  │
+│ xxx          │ ❌ 异常│ 文件损坏           │
+└──────────────┴────────┴──────────────────┘
+```
+
+报告后 ask 用户下一步：
+
+> ask(questions=[{
+>   header: "诊断完成",
+>   question: "共扫描 3 个 Skill：1 正常，2 有问题。请选择操作：",
+>   options: [
+>     { label: "⚡ 一键全修", desc: "自动修复所有可自动修复的问题" },
+>     { label: "📋 逐项查看", desc: "逐个展示每个 Skill 的诊断详情" },
+>     { label: "↩️ 返回主菜单" },
+>   ]
+> }])
+
+- **一键全修**：自动补全缺失字段、修正路径、移动文件，全部修完后统一走 A3→A4→A5 重装验证
+- **逐项查看**：逐个展示诊断详情，每个 Skill 修完再进下一个
+
+---
+
+### ② 问题定位
+
+扫描列表 → ask 选一个 Skill → 诊断问题（同下方 B2 诊断表）：
+
+> ask(questions=[{
+>   header: "诊断结果",
+>   question: "「{skill-name}」检测到以下问题，请选择操作：",
+>   options: [
+>     { label: "🤖 自动修复", desc: "AI 自动补全/修正/重装" },
+>     { label: "🛠️ 手动指定", desc: "由用户告诉怎么修" },
+>     { label: "⏪ 版本回滚", desc: "有备份则还原到上一版本" },
+>     { label: "↩️ 返回主菜单" },
+>   ]
+> }])
+
+**诊断表（通用）：**
 
 | 问题 | 检测方式 | 修复方法 |
 |------|---------|---------|
@@ -159,29 +268,85 @@ runAs: inline  # 或 subagent
 | 安装路径不对 | Skill 文件在错误的位置 | 移动到正确的 Agent 目录 |
 | 文件内容损坏 | 为空或无效 Markdown | 告知用户重新下载；如果记得原来源，引导用户从原项目重新获取；无法找回则建议用户联系原作者 |
 
-### B3: 修复 + 重装
+**修复规则：**
+- ⛔ **sudo 禁令**：禁止 `sudo` / `runas` 提权，遇权限错误立即中断
+- 修复完成后**必须走 A3→A4→A5** 重装验证
 
-根据诊断结果执行修复：
+> ✅ **完成！** `{skill-name}` 已修复，你现在可以试试 `/{skill-name}`
 
-- frontmatter 缺失 → ask 补全后写入
-- 路径不对 → 用 `cp` 或 `mv` 移到正确位置
-- 格式错误 → AI 自动修正格式
+---
 
-> ⛔ **sudo 禁令**：禁止 `sudo` / `runas` 提权，遇权限错误立即中断。
+### ③ 版本巡检
 
-修复完成后，**必须重新走安装流程**以确保 Skill 能正常使用：
+检查已安装 Skill 是否与源仓库版本一致。源地址获取优先级：
 
-1. **回到 A3** — 重新检测当前 Agent 类型
-2. **回到 A4** — 将修复后的 Skill 安装到正确的 Agent 目录
-3. **回到 A5** — 验证 `/{skill-name}` 能正常调用
+1. 本地 `known-sources.json`（手动维护的源列表）
+2. 自动推导：从安装路径的 Agent 目录 + Skill name 拼接 raw 直链试探
+3. 手动输入：ask 用户输入源地址
 
-> 只修文件不重装 = 修了但用不了。必须走 A3→A4→A5。
+对比版本后显示过时列表：
 
-### B4: 告知用户
+> ask(questions=[{
+>   header: "版本巡检",
+>   question: "发现 2 个 Skill 有新版本，请选择操作：",
+>   options: [
+>     { label: "🔄 更新全部", desc: "下载最新版并重新安装" },
+>     { label: "📝 逐项选择", desc: "选哪些更新，哪些跳过" },
+>     { label: "🙈 忽略本次" },
+>   ]
+> }])
 
-> ✅ **修复完成！**
-> 🔧 `{skill-name}` 已修复，问题：{问题描述}
-> 你现在可以重新试试：`/{skill-name}`
+更新流程：下载最新版 → 覆盖安装 → A5 验证
+
+---
+
+### ④ 深度清洁
+
+扫描三类问题，列出确认后清理：
+
+| 类型 | 说明 |
+|------|------|
+| 🗑️ 残留目录 | Skill 已删除但安装目录还在的空文件夹 |
+| ⚠️ 同名冲突 | 同一 Skill name 出现在多个目录（重复安装） |
+| 📦 备份文件 | 之前修复留下的 `.bak` 旧版本文件 |
+
+> ask(questions=[{
+>   header: "深度清洁",
+>   question: "发现 3 个可清理项，请选择操作：",
+>   options: [
+>     { label: "✅ 全部清理" },
+>     { label: "📝 逐项选择", desc: "逐个确认是否删除" },
+>     { label: "↩️ 返回主菜单" },
+>   ]
+> }])
+
+---
+
+### ⑤ 报告管理
+
+> ask(questions=[{
+>   header: "报告管理",
+>   question: "请选择操作：",
+>   options: [
+>     { label: "📤 导出诊断报告", desc: "生成 repair-log.md" },
+>     { label: "📥 查看上次记录", desc: "读取已存在的 repair-log.md" },
+>     { label: "📋 管理源列表", desc: "增删 known-sources.json 中的条目" },
+>     { label: "↩️ 返回主菜单" },
+>   ]
+> }])
+
+**`known-sources.json` 格式：**
+
+```json
+{
+  "sources": [
+    { "name": "quickstart", "url": "https://github.com/Kepsilent/quickstart" },
+    { "name": "soulcheck", "url": "https://github.com/user/soulcheck" }
+  ]
+}
+```
+
+存储在 Skill 安装目录的公共位置（如 `~/.reasonix/known-sources.json`），由用户或 AI 手动维护。
 
 ---
 
