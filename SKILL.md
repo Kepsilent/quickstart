@@ -16,49 +16,6 @@ runAs: inline
 
 ---
 
-## 使用方式
-
-### 安装适配
-
-**方式一：从网页链接安装**
-
-```
-/quickstart https://github.com/user/repo
-```
-
-**方式二：从本地文件安装**
-
-```
-/quickstart /path/to/skill.md
-```
-
-或者什么都不给，让 AI 问你：
-
-```
-/quickstart
-→ 点选「📥 安装一个新 Skill」
-→ 输入链接或路径
-```
-
-### 检查修复
-
-```
-/quickstart 修复
-```
-
-AI 会列出所有已安装的 Skill（带安装时间），你点选要修哪个。
-
-### 生成 Install.md
-
-```
-/quickstart 就这个项目
-/quickstart /path/to/project
-```
-
-AI 检测项目中的 Skill，生成唯一的 `Install.md`，任何 AI Agent 读了都能装。
-
----
-
 ## 执行指令
 
 ### Step 0: 解析用户输入 + 路由
@@ -104,12 +61,10 @@ curl --version
 | 本地路径 | `read_file` 读取 |
 | 文本内容（非 URL/路径） | 无法自动定位 → 用 ask 询问用户提供链接或路径，不要自行猜测 |
 
-> **URL 解析规则：** 用户给的不一定是 Skill 文件直链，可能是项目主页，需要逐层探测：
-> 1. 如果是 GitHub 项目链接（`github.com/user/repo`），先试探 `https://raw.githubusercontent.com/user/repo/main/SKILL.md`
-> 2. 如果返回 404，再试探 `https://raw.githubusercontent.com/user/repo/main/<项目名>.md`（项目名从 URL 取）
-> 3. 如果仍然 404，`git clone https://github.com/user/repo.git` 到临时目录，本地读取
-> 4. 如果是任意直链（`.md` 结尾），直接 `curl` 下载
-> 5. 所有方式均失败 → 告知用户无法获取 Skill 文件，流程结束
+> **URL 解析规则：** 用户给的不一定是直链，需要逐层探测：
+> 1. GitHub 项目链接 → 先试探 `raw.githubusercontent.com/user/repo/main/SKILL.md`，404 则试探 `<项目名>.md`，仍 404 则 `git clone` 到临时目录
+> 2. `.md` 直链 → 直接 `curl` 下载
+> 3. 全部失败 → 告知用户无法获取，流程结束
 
 下载/读取后，将内容保存在变量 `{skill_content}` 中。
 
@@ -149,8 +104,7 @@ runAs: inline  # 或 subagent
 | 存在 `.cursor/rules/` 目录 / `.cursorrules` | Cursor |
 | 以上都不匹配 | 通用兼容模式 |
 
-> AI 自行判断当前环境，不局限于上面的列表。
-> 如果你知道自己是什么 Agent，直接使用对应的安装方式。
+> AI 自行判断当前环境；如果你知道自己是什么 Agent，直接使用对应安装方式。
 
 ### A4: 安装适配
 
@@ -160,10 +114,9 @@ runAs: inline  # 或 subagent
 2. 将 Skill 文件写入该目录
 3. 如果来源是远程 URL，先下载再安装
 
-> ⛔ **sudo 禁令**：绝对禁止使用 `sudo` / `runas` / 管理员权限执行任何写入/移动/创建目录命令。如果遇到权限错误，立即中断并告知用户手动处理，不要尝试提权。
+> ⛔ **sudo 禁令**：禁止 `sudo` / `runas` 提权，遇权限错误立即中断并告知用户。
 >
-> AI 自行决定具体的安装命令，不需要拘泥于固定格式。
-> 核心目标只有一个：让用户能通过 `/{skill-name}` 调用这个 Skill。
+> AI 自行决定具体安装命令，核心目标：用户能通过 `/{skill-name}` 调用。
 
 ### A5: 验证安装
 
@@ -181,20 +134,7 @@ runAs: inline  # 或 subagent
 
 ### B1: 列出已安装的 Skill
 
-扫描你已知的常见 Skill 安装目录（例如 `~/.reasonix/skills/`、`~/.claude/skills/`、`.cursor/rules/` 等），按时间排序输出：
-
-```
-# 已安装的 Skill 列表（按安装时间排序）：
-┌──────────────┬──────────────────┬──────────────────────┐
-│ Skill 名称    │ 安装位置          │ 安装时间              │
-├──────────────┼──────────────────┼──────────────────────┤
-│ quickstart   │ ~/.reasonix/...  │ 2025-06-13 10:30     │
-│ soulcheck    │ ~/.reasonix/...  │ 2025-06-12 15:20     │
-│ xxx          │ ~/.claude/...    │ 2025-06-10 09:00     │
-└──────────────┴──────────────────┴──────────────────────┘
-```
-
-用 ask 让用户点选要修复哪个：
+扫描你已知的常见 Skill 安装目录（例如 `~/.reasonix/skills/`、`~/.claude/skills/`、`.cursor/rules/` 等），按时间排序列表，用 ask 让用户点选要修复哪个：
 
 > ask(questions=[{
 >   header: "选择要修复的 Skill",
@@ -227,7 +167,7 @@ runAs: inline  # 或 subagent
 - 路径不对 → 用 `cp` 或 `mv` 移到正确位置
 - 格式错误 → AI 自动修正格式
 
-> ⛔ **sudo 禁令**：绝对禁止使用 `sudo` / `runas` / 管理员权限执行任何移动/写入/创建目录命令。遇权限错误立即中断并告知用户。
+> ⛔ **sudo 禁令**：禁止 `sudo` / `runas` 提权，遇权限错误立即中断。
 
 修复完成后，**必须重新走安装流程**以确保 Skill 能正常使用：
 
@@ -235,7 +175,7 @@ runAs: inline  # 或 subagent
 2. **回到 A4** — 将修复后的 Skill 安装到正确的 Agent 目录
 3. **回到 A5** — 验证 `/{skill-name}` 能正常调用
 
-> 只修文件不重装 = 修了但用不了。必须完整走 A3→A4→A5。
+> 只修文件不重装 = 修了但用不了。必须走 A3→A4→A5。
 
 ### B4: 告知用户
 
@@ -247,8 +187,7 @@ runAs: inline  # 或 subagent
 
 ## 生成 Install.md
 
-> 唯一产物：项目根目录下的 `Install.md`，纯给 AI Agent 读的，不是给人看的。
-> 任何 AI Agent 读到 `Install.md`，就知道这个项目是什么、怎么把 Skill 装到自己身上。
+> 产物：项目根目录下的 `Install.md`，纯给 AI Agent 读的。
 
 ### C1: 确定目标目录
 
@@ -278,8 +217,7 @@ runAs: inline  # 或 subagent
 
 同时在 README.md **第一个 `---` 分隔线之后**注入一个「🚀 一键安装」独立板块（不要动 README 其他内容）。
 
-> Install.md 是「拼图」，SKILL.md 是「零件」。
-> 项目链接告诉 AI「去哪里买零件」。
+> Install.md 是「拼图」，SKILL.md 是「零件」—— 链接告诉 AI「去哪里买零件」。
 
 ### C4: 发布指引 + 安装咒语
 
@@ -290,8 +228,7 @@ Install.md 生成后，引导用户：
    - **GitHub** → `https://raw.githubusercontent.com/{用户}/{仓库}/main/Install.md`
 3. 咒语 = 该直链，用户复制丢给 AI 即可自动安装
 
-> 告诉用户：安装入口已就绪。发布项目后，把 Install.md 的直链丢给 AI，
-> AI 自己读文件、自己完成安装。
+> 发布后把 Install.md 直链丢给 AI，AI 自己读文件、自己完成安装。
 
 ---
 
