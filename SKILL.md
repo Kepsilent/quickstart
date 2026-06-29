@@ -1,6 +1,7 @@
 ---
 name: quickstart
 description: Skill 三合一工具：生成安装入口、自动适配安装、智能检查修复
+version: 1.0.0
 runAs: inline
 ---
 
@@ -54,6 +55,8 @@ curl --version
 ### A1: 获取目标 Skill
 
 根据输入内容，用对应方式获取：
+
+> ⚠️ 安全提醒：如果输入是远程 URL，先提醒用户确认来源可信后再下载。非 GitHub 域名的链接尤其需要谨慎。
 
 | 输入类型 | 获取方式 |
 |---------|---------|
@@ -113,6 +116,7 @@ runAs: inline  # 或 subagent
 1. 确定你的 Skill 安装目录（例如 `~/.reasonix/skills/{skill-name}/`、`~/.claude/skills/{skill-name}/`、`.cursor/rules/` 等）
 2. 将 Skill 文件写入该目录
 3. 如果来源是远程 URL，先下载再安装
+4. 如果来源是远程 URL，安装成功后自动将 `{ "name": "{skill-name}", "url": "{source-url}" }` 追加写入 `known-sources.json`
 
 > ⛔ **sudo 禁令**：禁止 `sudo` / `runas` 提权，遇权限错误立即中断并告知用户。
 >
@@ -278,7 +282,12 @@ flowchart TB
 
 ### ③ 版本巡检
 
-检查已安装 Skill 是否与源仓库版本一致。源地址获取优先级：
+检查已安装 Skill 是否与源仓库版本一致。
+
+> 版本以 SKILL.md frontmatter 中的 `version` 字段为准。
+> 工作流程：读取本地 SKILL.md frontmatter 的 version → 从源地址获取远程 SKILL.md 的 version → 比较两个值，不一致即为过时。
+
+源地址获取优先级：
 
 1. 本地 `known-sources.json`（手动维护的源列表）
 2. 自动推导：从安装路径的 Agent 目录 + Skill name 拼接 raw 直链试探
@@ -302,7 +311,7 @@ flowchart TB
 
 ### ④ 深度清洁
 
-扫描三类问题，列出确认后清理：
+扫描三类问题，先列出待清理项（非破坏性预览，不执行删除）：
 
 | 类型 | 说明 |
 |------|------|
@@ -314,7 +323,9 @@ flowchart TB
 >   header: "深度清洁",
 >   question: "发现 3 个可清理项，请选择操作：",
 >   options: [
->     { label: "✅ 全部清理" },
+>     { label: "👁️ 仅预览", desc: "只展示待清理项详情，不删除任何内容" },
+>     { label: "📦 备份后清理", desc: "删除前自动复制到临时备份目录（如 /tmp/quickstart-backup/）" },
+>     { label: "✅ 全部清理", desc: "不备份直接清理全部" },
 >     { label: "📝 逐项选择", desc: "逐个确认是否删除" },
 >     { label: "↩️ 返回主菜单" },
 >   ]
@@ -404,3 +415,41 @@ AI 在目标目录找 Skill 文件时，按以下优先级：
 1. 根目录的 `SKILL.md`
 2. 根目录有 frontmatter（`---`）的 `.md` 文件
 3. 无法找到 → 询问用户 Skill 文件在哪
+
+---
+
+## 附录：Install.md 模板
+
+生成 Install.md 时按以下结构：
+
+```
+---
+> 如果你是一个 AI Agent，你的任务是读取下面的链接完成安装
+
+# {项目名}
+
+项目链接：{项目链接}
+
+{一句话描述}
+
+---
+
+## 如果你是 AI Agent
+
+你的任务：把这个 Skill 安装到当前工作区，确保用户能直接调用 `/{skill-name}`。
+
+## Skill 文件
+
+位置：`SKILL.md`
+名称：`{skill-name}`
+
+## 安装步骤
+
+1. 读取 Skill 文件，确认 frontmatter 完整
+2. 根据你当前运行的 Agent 环境，将 Skill 装到对应的位置
+3. 验证 `/{skill-name}` 能正常响应
+
+---
+
+{可选的额外说明，如功能列表、使用示例}
+```
